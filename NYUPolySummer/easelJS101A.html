@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Easel JS 101</title>
+		<script type="text/javascript" src="easel.js"></script>
+		
+		<script type="text/javascript">
+
+		var stage; 
+		var canvas; 
+		var g; 
+		var s; 
+		var getRandX, getRandY; 
+
+		var circle; 
+		var location, accel, velocity, mass; 
+
+		function init () {
+			console.log(" I inited");
+			canvas = document.getElementById("canvas"); 
+			stage = new createjs.Stage(canvas); 
+			g = new createjs.Graphics();
+			//creates a one pixel line  
+			g.setStrokeStyle(1); 
+			g.beginStroke(createjs.Graphics.getRGB(0,0,0)); 
+			
+			s = new createjs.Shape(g);
+			s.width = 640; 
+			s.height = 480; 
+			stage.addChild(s);
+			createjs.Ticker.setFPS(60); 
+			createjs.Ticker.addListener(window); 
+			particle(); 
+		
+
+		}
+
+		function getRandomInt(min, max) {
+			return Math.floor( Math.random() * (max-min +1)) +min
+		} 
+
+
+		function tick(){
+			g.lineTo(stage.mouseX, stage.mouseY); 
+			stage.update(); 
+			getRandX = getRandomInt(0,10); 
+				//console.log(getRandX); 
+			
+			getRandY = getRandomInt(20,200);
+
+			//right home? 
+			//particle.updateParticle; 
+
+		} 
+		function createVector(p, xpos, ypos) {
+			var p= new createjs.Point(xpos,ypos); 
+			return p; 
+		} 
+
+		function particle() {
+			this.updateParticle = updateParticle(); 
+			var lifespan = 255; 
+			console.log("particle created"); 
+			velocity = createVector(velocity, Math.random(), Math.random()); 
+			accel = createVector(accel, 0.1, 0.1); 
+			mass = createVector(mass, 0.1,0.1); 
+			console.log(velocity.x, "I am x"); 
+			console.log(accel.x, "I am x"); 
+			circle = createCircle(); 
+}
+		function createCircle(){
+			var c_ = new createjs.Shape();
+			c_.graphics.beginFill("red").drawCircle(10,10,10); 
+			c_.x = 100; 
+			c_.y = 100; 
+			stage.addChild(c_);
+			return c_; 
+		} 
+	
+
+		function updateParticle(){
+			console.log("particle updated"); 
+			// velocity.x += accel.x; 
+			// location.x += velocity.x; 
+			// accel.x *=0; 
+
+			// velocity.y += accel.y; 
+			// location.y += velocity.y; 
+			// accel.y *=0; 
+
+			// lifespan -= 8.0; 
+
+		} 
+
+			</script>
+	</head>
+	<body onload="init()">
+		<p id="demo">DEMO</p>
+		<button type="button" onclick="alertFunction()" value="Show alert box"> Show alert box </button>
+		<canvas width="640" height="480" id="canvas">
+
+		</canvas>
+	</body>
+</html>

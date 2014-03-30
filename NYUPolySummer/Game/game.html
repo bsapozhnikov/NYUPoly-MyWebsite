@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title> Game </title>
+		<script src="../easel.js"></script>
+
+		<script>
+
+			var stage;
+			var canvas;
+			var g;
+
+			var gCircle;
+			var circle;
+
+			var radius = 10;
+
+			var gFood;
+			var food;
+			var foodX;
+			var foodY;
+
+			var level = 1;
+
+			var lfDn = false;
+			var rtDn = false;
+			var upDn = false;
+			var dnDn = false;
+
+
+			document.onkeydown = handleKeyDown;
+			document.onkeyup = handleKeyUp;
+
+			function init() {
+				//setup canvas
+				canvas = document.getElementById('canvas');
+				stage = new createjs.Stage(canvas);
+				g = new createjs.Graphics();
+				g.setStrokeStyle(1);
+				g.beginStroke(createjs.Graphics.getRGB(0,0,0));
+				s = new createjs.Shape(g);
+				s.width = 640;
+				s.height = 480;
+				stage.addChild(s);
+
+				//setup circle
+				gCircle = new createjs.Graphics();
+				gCircle.setStrokeStyle(1);
+				gCircle.beginStroke(createjs.Graphics.getRGB(0,0,0));
+				gCircle.beginFill (createjs.Graphics.getRGB(255,0,0));
+				gCircle.drawCircle(0,0,radius);
+				circle = new createjs.Shape(gCircle);
+				stage.addChild(circle);
+
+				//setup food
+				gFood = new createjs.Graphics();
+				gFood.setStrokeStyle(1);
+				gFood.beginStroke(createjs.Graphics.getRGB(0,0,0));
+				gFood.beginFill (createjs.Graphics.getRGB(0,0,255));
+				gFood.drawCircle(0,0,radius);
+				food = new createjs.Shape(gFood);
+				stage.addChild(food);
+				//
+
+				newGame();
+
+				//setup ticker
+				createjs.Ticker.setFPS(60);
+				createjs.Ticker.addListener(window);
+			}
+
+			function rand(min, max) {
+				return Math.random() * (max - min + 1) + min;
+			}
+
+			function distance(obj1, obj2) {
+				var xDist = obj2.x - obj1.x;
+				var yDist = obj2.y - obj1.y;
+				var dist =  Math.sqrt(xDist*xDist + yDist*yDist);
+				console.log(dist);
+				return dist;
+			}
+
+			function restart() {
+				circle.x = canvas.width * 0.5;
+				circle.y = canvas.height * 0.5;
+				
+				foodX = rand (0,canvas.width);
+				foodY = rand (0,canvas.height);
+				food.x = foodX;
+				food.y = foodY;
+			}
+
+			function newGame() {
+				level = 1;
+				document.getElementById('level').innerHTML = level;
+				restart();
+				
+			}
+
+			function eat() {
+				level += 1;
+				document.getElementById('level').innerHTML = level;
+				restart();
+			}
+
+			function checkDist() {
+				if (distance(circle,food) <= radius * 2) {
+					eat();
+				}
+			}
+
+			function tick() {
+				if (lfDn) {
+					circle.x -= 1;
+					checkDist();
+				};
+				if (upDn) {
+					//console.log("left");
+					circle.y -= 1;
+					checkDist();
+				};
+				if (rtDn) {
+					circle.x += 1;
+					checkDist();
+				};
+				if (dnDn) {
+					circle.y += 1;
+					checkDist();
+				};
+				stage.update();
+
+			}
+
+			function handleKeyDown (e) {
+				if (!e) { var e = window.event; }
+				switch (e.keyCode) {
+					case 37: 	lfDn = true; break;
+					case 38: 	upDn = true; break;
+					case 39: 	rtDn = true; break;
+					case 40: 	dnDn = true; break;
+
+					case 82: 	newGame(); break;
+				}
+			}
+
+			function handleKeyUp (e) {
+				if (!e) { var e = window.event; }
+				switch (e.keyCode) {
+					case 37: 	lfDn = false; break;
+					case 38: 	upDn = false; break;
+					case 39: 	rtDn = false; break;
+					case 40: 	dnDn = false; break;
+				}
+			}
+
+		</script>
+
+		<style type="text/css">
+			/*button {
+				color: blue;
+			}*/
+		</style>
+	</head>
+
+	<body onload="init()">
+		<canvas width="640" height="480" id="canvas"></canvas>
+		<br>
+		<button type="button" name="restart" onclick="newGame()"> Restart </button>
+		<div>
+			Level: <div id="level">1</div>
+		</div>
+	</body>
+</html>

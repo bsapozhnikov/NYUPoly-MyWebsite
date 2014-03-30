@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>A Basic Home Page Built With LESS</title>
+		<link rel="stylesheet" type="text/css" href="homeStyles.css">
+	</head>
+	<body>
+		<div id="header">
+			<div id="headerText"> Hello World! </div>
+		</div>
+		<div id="nav">
+			<ul>
+				<li><a href="home.html"> Home </a></li>
+				<li><a href="../Game/game06.html"> GAME </a></li>
+				<li><a href="../imageGallery.html"> Images </a></li>
+				<li><a href="../slidingDoor.html"> Sliding Door </a></li>
+				<li><a href="#bunny"> Bunny </a></li>
+				<li><a href="../box.html"> 3D CSS-only Box </a></li>
+				<li><a href="../flexbox.html"> Flex Box </a></li>
+			</ul>
+		</div>
+		
+		<div class="column" id="col1">
+			<p>This is a basic home page I made on <a href="http://www.sublimetext.com/2" target="_blank"> Sublime Text 2 </a>
+			for the NYU Poly Web Design course. </p>
+	
+			<p><a name="bunny"> And this is a bunny: </a><br>
+			<img src="http://www.rabbit.org/adoption/bunny.jpg" alt="bunny" height="50%" width="75%" onclick="redFun()"></p>
+		</div>
+
+		<div class="column" id="col2">
+			<script>
+				document.write("<p>This was added to the page with Javascript!</p>")
+				for(var x=1,colors=new Array("Lavender","Seafoam Green", "Sky Blue", "Fire Red", "Chartreuse") ; x<6; x++){
+					document.write("<p>" + x + ". " + colors[x-1] + "</p>")
+				}
+
+				var y=0,realColors=new Array("red","blue","green","black","purple", "orange", "deeppink", "coral", "indigo") 
+				
+				while(y<8){
+					document.write('<font color="' + realColors[y] + '">' + y + "</font>")
+					y++
+				}
+			</script>
+		</div>
+
+		<div class="column" id="col3">
+			<p><a name="colors"> Here is a list of colors </a></p>
+			<ul class="centerText">
+				<li id="blue">Blue</li>
+				<li id="red">Red</li>
+				<li id="green">Green</li>
+			</ul>
+
+			<p> And a list of Greek letters </p>
+			<ul class="centerText" id="greek">
+				<li>Alpha</li>
+				<li>Beta</li>
+				<li>Gamma</li>
+			</ul>
+		</div>
+		<script type="text/javascript">
+			function redFun(){
+				var redList = document.getElementById('red');
+
+				console.log(redList);
+				if(redList.id === 'red'){
+					redList.id = "purple";
+					redList.innerHTML = "Purple";
+					redList = document.getElementById('purple');
+				}
+			}
+		</script>
+	</body>
+</html>
+

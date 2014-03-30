@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title> Game </title>
+		<link rel="stylesheet" type="text/css" href="gameStyles.css">
+		<script src="easel.js"></script>
+
+		<script>
+
+			var stage;
+			var canvas;
+			var g;
+			var s;
+
+			var gPlayer;
+			var player;
+
+			var radius = 10;
+
+			var pBulletRadius = 2;
+			var pBulletX;
+			var pBulletY;
+			var pBulletR;
+			var pBulletSpeed = 1.5;
+			var pBulletG;
+
+
+			var gBomb;
+			var bomb;
+			var bombX;
+			var bombY;
+			var blast = 30;
+			var bombSpeed = .7;
+			var bombWiggle = 10;
+
+			var gShooter;
+			var shooter;
+			var shooterX;
+			var shooterY;
+			var shooterR;
+			var shooterSpeed = .9;
+			var shooterWiggle = 6;
+			var shooterRange = 10;
+
+			var eBulletRadius = 2;
+			var eBulletX;
+			var eBulletY;
+			var eBulletR;
+			var eBulletSpeed = 1;
+			var eBulletG;
+
+
+			var level = 1;
+			var numEnemies = 0;
+
+			var bs;
+			var ss;
+			var gun;
+			var egun;
+
+
+			var lfDn = false;
+			var rtDn = false;
+			var upDn = false;
+			var dnDn = false;
+			var pause = true;
+
+
+			document.onkeydown = handleKeyDown;
+			document.onkeyup = handleKeyUp;
+
+			function createVector(xpos, ypos) {
+				// console.log("createVector");  
+				var p= new createjs.Point(xpos,ypos); 
+				return p; 
+			} 
+
+			function rand(min, max) {
+				// console.log("rand");
+				return Math.random() * (max - min + 1) + min;
+			}
+
+			function distance(obj1, obj2) {
+				// console.log('distance');
+				var xDist = obj2.x - obj1.x;
+				var yDist = obj2.y - obj1.y;
+				var dist =  Math.sqrt(xDist*xDist + yDist*yDist);
+				//// console.log(dist);
+				return dist;
+			}
+
+			function toRadians (angle) {
+				// console.log('toRadians');
+				return angle * (Math.PI / 180);
+			}
+
+			function init() {
+				// console.log('init');
+				//setup canvas
+				canvas = document.getElementById('canvas');
+				stage = new createjs.Stage(canvas);
+				g = new createjs.Graphics();
+				g.setStrokeStyle(1);
+				g.beginStroke(createjs.Graphics.getRGB(0,0,0));
+				s = new createjs.Shape(g);
+				s.width = 640;
+				s.height = 480;
+				stage.addChild(s);
+
+				newGame();
+
+				//setup ticker
+				createjs.Ticker.setFPS(60);
+				createjs.Ticker.addListener(window);
+
+				//
+				//// console.log(player.x);
+			}
+
+			function empty() {
+				// console.log('empty');
+				// console.log("empty");
+			}
+
+			function gameOver() {
+				// console.log('gameOver');
+				//// console.log("off");
+				// document.getElementById('game').innerHTML = "off";
+				
+				// window.setTimeout("empty()",1000);
+				// // console.log("gameOver-ing");
+				newGame();
+				lfDn = false;
+				rtDn = false;
+				upDn = false;
+				dnDn = false;
+
+
+			}
+
+			function pBullet(startPos, rot) {
+				// console.log('pBullet');
+				this.location = new createjs.Point();
+				this.location.x = startPos.x;
+				this.location.y = startPos.y;
+				this.rotation = rot;
+				this.speed = pBulletSpeed;
+				this.pBulletCircle;
+				return this;
+			}
+
+			pBullet.prototype.createpBulletCircles = function() {
+				// console.log('pBullet.prototype.createpBulletCircles');
+				//// console.log("creating pBullets");
+				pBulletG = new createjs.Graphics();
+				pBulletG.setStrokeStyle(1);
+				pBulletG.beginStroke(createjs.Graphics.getRGB(0,0,0));
+				pBulletG.beginFill (createjs.Graphics.getRGB(255,255,255));
+				pBulletG.drawCircle(0,0,pBulletRadius);
+				// this.pBulletCircle.graphics.setStrokeStyle(1);
+				// this.pBulletCircle.graphics.beginStroke(createjs.Graphics.getRGB(0,255,0));
+				// this.pBulletCircle.graphics.beginFill(createjs.Graphics.getRGB(0,255,0));
+				this.pBulletCircle = new createjs.Shape(pBulletG);
+				this.pBulletCircle.x = this.location.x;
+				this.pBulletCircle.y = this.location.y;
+				this.pBulletCircle.rotation = 180 - this.rotation;
+				// this.pBulletCircle.regX = this.pBulletCircle.x;
+				// this.pBulletCircle.regY = this.pBulletCircle.y;
+				stage.addChild(this.pBulletCircle);
+				// // console.log(this.pBulletCircle.x);
+				// // console.log(this.pBulletCircle.y);
+				// // console.log(this.pBulletCircle.rotation);
+			};
+
+			pBullet.prototype.updatepBullet = function(){
+				// console.log('pBullet.prototype.updatepBullet');
+				this.pBulletCircle.x += pBulletSpeed * Math.cos(toRadians(90 - this.pBulletCircle.rotation));
+				this.pBulletCircle.y += pBulletSpeed * Math.sin(toRadians(90 - this.pBulletCircle.rotation));
+
+				for (var i = 0; i < ss.numShooters; i++) {
+					// // console.log(ss.shooters[i].tri.x);
+					// // console.log(distance(this.pBulletCircle,ss.shooters[i]))
+					if (distance(this.pBulletCircle,ss.shooters[i].tri) < 10) {
+						// // console.log("killing shooter");
+						ss.shooters[i].die();
+						stage.removeChild(this.pBulletCircle);
+					};
+				};
+
+				if(this.pBulletCircle.x < 0 || this.pBulletCircle.x > canvas.width || this.pBulletCircle.y < 0 || this.pBulletCircle.y > canvas.height) {
+					stage.removeChild(this.pBulletCircle);
+				}
+
+				//// console.log(this.pBulletCircle.x);
+			};
+
+			function pBulletSystem() {
+				// console.log('pBulletSystem');
+				this.pBullets = new Array();
+				this.numpBullets = 0;
+				this.startPos = new createjs.Point();
+
+			}
+
+			pBulletSystem.prototype.addpBullet = function() {
+				// console.log('pBulletSystem.prototype.addpBullet');
+				pBulletX = player.x;
+				pBulletY = player.y;
+				pBulletR = player.rotation;
+				this.startPos.x = pBulletX;
+				this.startPos.y = pBulletY;
+				var currentpBullet = new pBullet(this.startPos,pBulletR);
+				this.pBullets.push(currentpBullet);
+				currentpBullet.createpBulletCircles();
+				// // console.log(this.pBullets);
+			};
+
+			pBulletSystem.prototype.pBulletsSetup = function() {
+				// console.log('pBulletSystem.prototype.pBulletsSetup');
+				for (var i = 0; i < this.numpBullets; i++) {
+					this.addpBullet();
+					this.pBullets[i].createpBulletCircles();
+				};
+			};
+
+			pBulletSystem.prototype.pBulletUpdate = function() {
+				// console.log('pBulletSystem.prototype.pBulletUpdate');
+				for (var i = 0; i < this.numpBullets; i++) {
+					this.pBullets[i].updatepBullet();
+				};
+
+			};
+
+
+			function bombAndRadius(location) {
+				// console.log('bombAndRadius');
+				this.location = new createjs.Point();
+				this.location.x = location.x;
+				this.location.y = location.y;
+				this.speed = bombSpeed;
+				this.circle;
+				return this;
+
+			}
+
+			bombAndRadius.prototype.die = function() {
+				// console.log('bombAndRadius.prototype.die');
+				// // console.log("dying");
+				//// console.log(this.parent);
+				this.circle.x = undefined;
+				this.circle.y = undefined;
+				//next line may cause problem with multiple bombs
+				////bs.numBombs -= 1;
+				stage.removeChild(this.circle);
+				// // console.log(this.circle.x);
+				// level += 1;
+			};
+
+			bombAndRadius.prototype.createCircles = function() {
+				// console.log('bombAndRadius.prototype.createCircles');
+				//// console.log("creating bombs");
+				this.circle = new createjs.Shape();
+				this.circle.graphics.beginRadialGradientFill(["#0000FF", "#FFFFFF"], [.01, 1], this.location.x, this.location.y, 0, this.location.x, this.location.y, blast).drawCircle(this.location.x, this.location.y, blast);
+				this.circle.x = this.location.x;
+				this.circle.y = this.location.y;
+				this.circle.regX = this.circle.x;
+				this.circle.regY = this.circle.y;
+				stage.addChild(this.circle);
+			};
+
+			bombAndRadius.prototype.explode = function() {
+				// console.log('bombAndRadius.prototype.explode');
+				// // console.log("exploding");
+				// //// console.log("called die function");
+				if(distance(this.circle,player) <= blast) {
+					gameOver();
+
+				}
+				else{
+					this.die();
+				};
+			};
+
+
+			bombAndRadius.prototype.updateBomb = function(){
+				// console.log('bombAndRadius.prototype.updateBomb');
+				//// console.log("updateBomb");
+
+
+				if(distance(this.circle,player) <= blast) {
+					//// console.log(this);
+					var thisBomb = this;
+					//// console.log(thisBomb);
+					window.setTimeout(function(){thisBomb.explode();},1000);
+				}
+
+				//// console.log(this);
+				var r = rand(this.circle.rotation-bombWiggle, this.circle.rotation+bombWiggle);
+				this.circle.rotation = r
+				//// console.log(r);
+				if(this.circle.x > canvas.width || this.circle.x < 0) {
+					this.circle.rotation += 180;
+				};
+				if(this.circle.y > canvas.height || this.circle.y < 0) {
+					this.circle.rotation += 180;
+				};
+				this.circle.x += bombSpeed * Math.cos(toRadians(90 - this.circle.rotation));
+				this.circle.y += bombSpeed * Math.sin(toRadians(90 - this.circle.rotation));
+
+			};
+
+
+			function bombSystem() {
+				// console.log('bombSystem');
+				this.bombs = new Array();
+				this.numBombs = level;
+				this.startPlace = new createjs.Point();
+
+			}
+
+			bombSystem.prototype.addBomb = function() {
+				// console.log('bombSystem.prototype.addBomb');
+				bombX = rand (0,canvas.width);
+				bombY = rand (0,canvas.height);
+				// bombX = 320;
+				// bombY = 220;
+				this.startPlace.x = bombX;
+				this.startPlace.y = bombY;
+				// this.startPlace.x = 320;
+				// this.startPlace.y = 220;
+				var currentBomb = new bombAndRadius(this.startPlace);
+				this.bombs.push(currentBomb);
+				//// console.log(this.bombs);
+			};
+
+			bombSystem.prototype.bombsSetup = function() {
+				// console.log('bombSystem.prototype.bombsSetup');
+				for (var i = 0; i < this.numBombs; i++) {
+					this.addBomb();
+					this.bombs[i].createCircles();
+				};
+			};
+
+			bombSystem.prototype.update = function() {
+				// console.log('bombSystem.prototype.update');
+				for (var i = 0; i < this.numBombs; i++) {
+					this.bombs[i].updateBomb();
+				};
+			};
+
+			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+			function shooter(location,orientation) {
+				// console.log('shooter');
+				this.location = new createjs.Point();
+				this.location.x = location.x;
+				this.location.y = location.y;
+				this.rotation = orientation;
+				this.speed = shooterSpeed;
+				this.tri;
+				return this;
+
+			}
+
+			shooter.prototype.die = function() {
+				// console.log('shooter.prototype.die');
+				// // console.log("dying");
+				//// console.log(this.parent);
+				this.tri.x = undefined;
+				this.tri.y = undefined;
+				// //next line may cause problem with multiple bombs
+				// ////bs.numBombs -= 1;
+				stage.removeChild(this.tri);
+				// // console.log(this.circle.x);
+				// level += 1;
+
+				numEnemies -= 1;
+				// console.log(numEnemies)
+				if(numEnemies == 0){
+					// console.log("next level");
+					level += 1;
+					restart();
+				};
+				// // console.log(level);
+			};
+
+			shooter.prototype.createTris = function() {
+				// console.log('shooter.prototype.createTris');
+				//// console.log("creating bombs");
+				gShooter = new createjs.Graphics();
+				gShooter.setStrokeStyle(1);
+				gShooter.beginStroke(createjs.Graphics.getRGB(0,0,0));
+				gShooter.beginFill (createjs.Graphics.getRGB(0,255,0));
+				gShooter.drawPolyStar(0,0,radius,3,0,270);
+				this.tri = new createjs.Shape(gShooter);
+				stage.addChild(this.tri);
+
+				this.tri.x = this.location.x;
+				this.tri.y = this.location.y;
+				this.tri.rotation = this.rotation;
+			};
+
+			shooter.prototype.shoot = function() {
+				// console.log('shooter.prototype.shoot');
+				// // console.log("shooting");
+
+				egun.numeBullets += 1; 
+				egun.addeBullet(this.tri.x,this.tri.y,this.tri.rotation);
+				// // //// console.log("called die function");
+				// if(distance(this.circle,player) <= blast) {
+				// 	gameOver();
+
+				// }
+				// else{
+				// 	this.die();
+				// };
+			};
+
+
+			shooter.prototype.updateShooter = function(){
+				// console.log('shooter.prototype.updateShooter');
+				//// console.log("updateBomb");
+				var d = distance(this.tri, player);
+				var xD = d * Math.cos(toRadians(90 - this.tri.rotation));
+				var yD = -1 * d * Math.sin(toRadians(90 - this.tri.rotation));
+				var checkPoint = new createjs.Point();
+				checkPoint.x = xD + this.tri.x;
+				checkPoint.y = yD + this.tri.y;
+
+				if(distance(checkPoint,player) <= shooterRange) {
+					this.shoot();
+				// 	//// console.log(this);
+				// 	var thisBomb = this;
+				// 	//// console.log(thisBomb);
+				// 	window.setTimeout(function(){thisBomb.explode();},1000);
+				}
+
+				// //// console.log(this);
+				// // console.log(this.tri);
+				var r = rand(this.tri.rotation - shooterWiggle, this.tri.rotation + shooterWiggle);
+				this.tri.rotation = r
+				//// console.log(r);
+				if(this.tri.x > canvas.width || this.tri.x < 0) {
+					this.tri.rotation += 180;
+				};
+				if(this.tri.y > canvas.height || this.tri.y < 0) {
+					this.tri.rotation += 180;
+				};
+				this.tri.x += shooterSpeed * Math.cos(toRadians(90 - this.tri.rotation));
+				this.tri.y -= shooterSpeed * Math.sin(toRadians(90 - this.tri.rotation));
+
+			};
+
+
+			function shooterSystem() {
+				// console.log('shooterSystem');
+				this.shooters = new Array();
+				this.numShooters = level;
+				this.startPlace = new createjs.Point();
+
+			}
+
+			shooterSystem.prototype.addShooter = function() {
+				// console.log('shooterSystem.prototype.addShooter');
+				shooterX = rand (0,canvas.width);
+				shooterY = rand (0,canvas.height);
+				this.startPlace.x = shooterX;
+				this.startPlace.y = shooterY;
+				var currentShooter = new shooter(this.startPlace, rand(0,360));
+				this.shooters.push(currentShooter);
+				//// console.log(this.bombs);
+			};
+
+			shooterSystem.prototype.shootersSetup = function() {
+				// console.log('shooterSystem.prototype.shootersSetup');
+				for (var i = 0; i < this.numShooters; i++) {
+					this.addShooter();
+					this.shooters[i].createTris();
+					numEnemies += 1;
+				};
+				// // console.log(numEnemies);
+			};
+
+			shooterSystem.prototype.update = function() {
+				// console.log('shooterSystem.prototype.update');
+				for (var i = 0; i < this.numShooters; i++) {
+					this.shooters[i].updateShooter();
+				};
+			};
+
+
+			function eBullet(startPos, rot) {
+				// console.log('eBullet');
+				this.location = new createjs.Point();
+				this.location.x = startPos.x;
+				this.location.y = startPos.y;
+				this.rotation = rot;
+				this.speed = eBulletSpeed;
+				this.eBulletCircle;
+				return this;
+			}
+
+			eBullet.prototype.createeBulletCircles = function() {
+				// console.log('eBullet.prototype.createeBulletCircles');
+				//// console.log("creating pBullets");
+				eBulletG = new createjs.Graphics();
+				eBulletG.setStrokeStyle(1);
+				eBulletG.beginStroke(createjs.Graphics.getRGB(0,0,0));
+				eBulletG.beginFill (createjs.Graphics.getRGB(0,0,0));
+				eBulletG.drawCircle(0,0,eBulletRadius);
+				// this.pBulletCircle.graphics.setStrokeStyle(1);
+				// this.pBulletCircle.graphics.beginStroke(createjs.Graphics.getRGB(0,255,0));
+				// this.pBulletCircle.graphics.beginFill(createjs.Graphics.getRGB(0,255,0));
+				this.eBulletCircle = new createjs.Shape(eBulletG);
+				this.eBulletCircle.x = this.location.x;
+				this.eBulletCircle.y = this.location.y;
+				this.eBulletCircle.rotation = 180 - this.rotation;
+				// this.pBulletCircle.regX = this.pBulletCircle.x;
+				// this.pBulletCircle.regY = this.pBulletCircle.y;
+				stage.addChild(this.eBulletCircle);
+				// // console.log(this.pBulletCircle.x);
+				// // console.log(this.pBulletCircle.y);
+				// // console.log(this.pBulletCircle.rotation);
+			};
+
+			eBullet.prototype.updateeBullet = function(){
+				// console.log('eBullet.prototype.updateeBullet');
+				this.eBulletCircle.x += eBulletSpeed * Math.cos(toRadians(90 - this.eBulletCircle.rotation));
+				this.eBulletCircle.y += eBulletSpeed * Math.sin(toRadians(90 - this.eBulletCircle.rotation));
+
+
+				if (distance(this.eBulletCircle,player) < 10) {
+					// // console.log("killing player");
+					gameOver();
+				};
+				
+
+				if(this.eBulletCircle.x < 0 || this.eBulletCircle.x > canvas.width || this.eBulletCircle.y < 0 || this.eBulletCircle.y > canvas.height) {
+					stage.removeChild(this.eBulletCircle);
+				}
+
+				//// console.log(this.pBulletCircle.x);
+			};
+
+			function eBulletSystem() {
+				// console.log('eBulletSystem');
+				this.eBullets = new Array();
+				this.numeBullets = 0;
+				this.startPos = new createjs.Point();
+
+			}
+
+			eBulletSystem.prototype.addeBullet = function(x_,y_,r_) {
+				// console.log('eBulletSystem.prototype.addeBullet');
+				eBulletX = x_;
+				eBulletY = y_;
+				eBulletR = r_;
+				this.startPos.x = eBulletX;
+				this.startPos.y = eBulletY;
+				var currenteBullet = new eBullet(this.startPos,eBulletR);
+				this.eBullets.push(currenteBullet);
+				currenteBullet.createeBulletCircles();
+				// // console.log(this.pBullets);
+			};
+
+			eBulletSystem.prototype.eBulletsSetup = function() {
+				// console.log('eBulletSystem.prototype.eBulletsSetup');
+				for (var i = 0; i < this.numeBullets; i++) {
+					this.addeBullet();
+					this.eBullets[i].createeBulletCircles();
+				};
+			};
+
+			eBulletSystem.prototype.eBulletUpdate = function() {
+				// console.log('eBulletSystem.prototype.eBulletUpdate');
+				for (var i = 0; i < this.numeBullets; i++) {
+					this.eBullets[i].updateeBullet();
+				};
+
+			};
+
+
+
+			function restart() {
+				//bug-testing
+				// console.log("restart");
+
+
+
+				//
+				stage.removeAllChildren();
+
+				numEnemies = 0;
+
+				// bombX = rand (0,canvas.width);
+				// bombY = rand (0,canvas.height);
+				// bomb.x = bombX;
+				// bomb.y = bombY;
+
+				//setup bombs
+				bs = new bombSystem();
+				bs.bombsSetup();
+
+				// gBomb = new createjs.Graphics();
+				// gBomb.setStrokeStyle(1);
+				// gBomb.beginStroke(createjs.Graphics.getRGB(0,0,0));
+				// gBomb.beginFill (createjs.Graphics.getRGB(0,0,255));
+				// gBomb.drawCircle(0,0,radius);
+				// bomb = new createjs.Shape(gBomb);
+				// stage.addChild(bomb);
+				//
+
+				//setup shooters
+				ss = new shooterSystem();
+				ss.shootersSetup();
+
+				//setup player
+				gPlayer = new createjs.Graphics();
+				gPlayer.setStrokeStyle(1);
+				gPlayer.beginStroke(createjs.Graphics.getRGB(0,0,0));
+				gPlayer.beginFill (createjs.Graphics.getRGB(255,0,0));
+				gPlayer.drawPolyStar(0,0,radius,3,0,270);
+				player = new createjs.Shape(gPlayer);
+				stage.addChild(player);
+
+				player.x = canvas.width * 0.5;
+				player.y = canvas.height * 0.5;
+				player.rotation = 0;
+
+				//setup player's bullets
+				gun = new pBulletSystem();
+				// gun.pBulletsSetup();
+				egun = new eBulletSystem();
+
+				document.getElementById('level').innerHTML = level;
+
+
+				// document.getElementById('game').innerHTML = "on";
+
+				//bug-testing
+				player.x += 1;
+				player.y += 1;
+				player.rotation += 1;
+				
+			}
+
+			function newGame() {
+				// console.log('newGame');
+				level = 1;
+				// document.getElementById('level').innerHTML = level;
+				restart();
+				
+			}
+
+			// function eat() {
+			// 	level += 1;
+			// 	document.getElementById('level').innerHTML = level;
+			// 	restart();
+			// }
+
+			// function checkDist() {
+			// 	if (distance(player,bomb) <= radius * 2) {
+			// 		eat();
+			// 	}
+			// }
+
+			function tick() {
+				if (!pause) {
+					// console.log('tick');
+
+
+					if (lfDn) {
+						player.rotation -= 3;
+						//checkDist();
+					};
+					if (upDn) {
+						//// console.log(player.rotation );
+						player.x += Math.cos(toRadians(90 - player.rotation));
+						player.y -= Math.sin(toRadians(90 - player.rotation));
+						//// console.log(player.x, player.y);
+						//checkDist();
+					};
+					if (rtDn) {
+						player.rotation += 3;
+						//checkDist();
+					};
+					// if (dnDn) {
+					// 	player.y += 1;
+					// 	//checkDist();
+					// };
+
+					bs.update();
+
+					ss.update();
+
+					gun.pBulletUpdate();
+
+					egun.eBulletUpdate();
+
+					stage.update();
+				}
+			}
+
+			function handleKeyDown (e) {
+				// console.log('handleKeyDown');
+				if (!e) { var e = window.event; }
+				switch (e.keyCode) {
+					case 37: 	lfDn = true; break;
+					case 38: 	upDn = true; break;
+					case 39: 	rtDn = true; break;
+					//case 40: 	dnDn = true; break;
+
+					case 82: 	newGame(); break;
+				}
+			}
+
+			function handleKeyUp (e) {
+				// console.log('handleKeyUp');
+				if (!e) { var e = window.event; }
+				switch (e.keyCode) {
+					case 32: 	gun.numpBullets += 1; 
+								gun.addpBullet();
+								// gun.numpBullets += 1; 
+								break;
+
+					case 37: 	lfDn = false; break;
+					case 38: 	upDn = false; break;
+					case 39: 	rtDn = false; break;
+					//case 40: 	dnDn = false; break;
+
+					case 80: 	pause = !pause; break;
+				}
+			}
+
+		</script>
+
+	</head>
+
+	<body onload="init()">
+		<div id="header">
+			<div id="headerText"> Game! </div>
+		</div>
+		<div id="nav">
+			<ul>
+				<li><a href="../basichomepageLESS/home.html"> Home </a></li>
+				<li><a href="../Game/game06.html"> GAME </a></li>
+				<li><a href="../imageGallery.html"> Images </a></li>
+				<li><a href="../slidingDoor.html"> Sliding Door </a></li>
+				<li><a href="../basichomepageLESS/home.html#bunny"> Bunny </a></li>
+				<li><a href="../box.html"> 3D CSS-only Box </a></li>
+				<li><a href="../flexbox.html"> Flex Box </a></li>
+			</ul>
+		</div>
+		<br>
+		<div class="column">
+			<h4>Instructions</h4>
+			Destroy all the shooters while avoiding their bullets and the bombs. After stepping in a bomb's blast radius, you have 3 seconds before the bomb explodes. Clear all shooters to advance to the next level.
+			<br>
+			Press "Pause" or p to start, pause, and unpause youe game. Press "Restart" or r to restart the level.
+		</div>
+		<!-- <canvas width="640" height="480" id="canvas"></canvas> -->
+		<canvas width="640" height="480" id="canvas"></canvas>
+		<div class="column">
+			<button type="button" name="restart" onclick="newGame()"> Restart </button>
+			<button type="button" name="restart" onclick="pause = !pause;"> Pause </button> 
+			<div>
+				Level: <div id="level">1</div>
+				<!-- Test: <div id="game"></div> -->
+			</div>
+		</div>
+	</body>
+</html>

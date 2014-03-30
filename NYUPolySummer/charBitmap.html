@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title> Ye Old Bob Bitmap </title>
+		<script src="easel.js"></script>
+
+		<script>
+
+			var stage;
+			var canvas;
+			var g;
+			var circle;
+			var logo;
+
+			function init() {
+				canvas = document.getElementById('canvas');
+				stage = new createjs.Stage(canvas);
+				g = new createjs.Graphics();
+				g.setStrokeStyle(1);
+				g.beginStroke(createjs.Graphics.getRGB(0,0,0));
+				s = new createjs.Shape(g);
+				s.width = 640;
+				s.height = 480;
+				stage.addChild(s);
+
+				// circle = new createjs.Shape();
+				// circle.graphics.beginFill("red").drawCircle(50,50,50); 
+				// circle.x = 100; 
+				// circle.y = 100; 
+				// stage.addChild(circle);
+
+				createjs.Ticker.setFPS(60);
+				createjs.Ticker.addListener(window);
+
+				logo = new createjs.Bitmap ("charBob.png");
+				logo.y = 310;
+
+				// //this is what you need to do to roate around a center point 
+				logo.regX = logo.image.width *0.5; 
+				logo.regY = logo.image.height * 0.5;
+				stage.addChild(logo);
+
+				
+			}
+
+			function tick() {
+				logo.x += (stage.mouseX - logo.x) * 0.5;
+				
+				// g.lineTo(logo.x, logo.y); 
+				// circle.x = circle.x + 10; 
+				stage.update();
+			}
+
+		</script>
+
+		<style type="text/css">
+			canvas {
+				background-image: url('charBackground.png');
+			}
+		</style>
+	</head>
+
+	<body onload="init()">
+		<canvas width="640" height="480" id="canvas"></canvas>
+	</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>A Basic Home Page</title>
+		<link rel="stylesheet" type="text/css" href="basic3.css">
+	</head>
+	<body>
+		<div id="header">
+			<div id="headerText"> Hello World! </div>
+		</div>
+		<div id="nav">
+			<ul>
+				<li><a href="#"> Home </a></li>
+				<li><a href="imageGallery.html"> Images </a></li>
+				<li><a href="slidingDoor.html"> Sliding Door </a></li>
+				<li><a href="#bunny"> Bunny </a></li>
+			</ul>
+		</div>
+		
+		<div class="column" id="col1">
+			<p>This is a basic home page I made on <a href="http://www.sublimetext.com/2" target="_blank"> Sublime Text 2 </a>
+			for the NYU Poly Web Design course. </p>
+	
+			<p><a name="bunny"> And this is a bunny: </a><br>
+			<img id="rabbit"src="http://www.rabbit.org/adoption/bunny.jpg" alt="bunny" height="50%" width="75%"></p>
+		</div>
+
+		<div class="column" id="col2">
+			<p><a name="colors"> Here is a list of colors </a></p>
+			<ul class="centerText">
+				<li id="blue">Blue</li>
+				<li id="red">Red</li>
+				<li id="green">Green</li>
+			</ul>
+
+			<p> And a list of Greek letters </p>
+			<ul class="centerText" id="greek">
+				<li>Alpha</li>
+				<li>Beta</li>
+				<li>Gamma</li>
+			</ul>
+		</div>
+
+		<div class="column" id="col3">
+			<script>
+				document.write("<p>This was added to the page with Javascript!</p>")
+			</script>
+		</div>
+	</body>
+</html>
+

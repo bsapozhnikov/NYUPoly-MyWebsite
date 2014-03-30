@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title> Game </title>
+		<script src="../easel.js"></script>
+
+		<script>
+
+			var stage;
+			var canvas;
+			var g;
+
+			var gPlayer;
+			var player;
+
+			var radius = 10;
+
+			var gBomb;
+			var bomb;
+			var bombX;
+			var bombY;
+			var blast = 70;
+			var bombSpeed = .7;
+			var bombWiggle = 10;
+
+			var level = 1;
+
+			var lfDn = false;
+			var rtDn = false;
+			var upDn = false;
+			var dnDn = false;
+
+
+			document.onkeydown = handleKeyDown;
+			document.onkeyup = handleKeyUp;
+
+			function init() {
+				//setup canvas
+				canvas = document.getElementById('canvas');
+				stage = new createjs.Stage(canvas);
+				g = new createjs.Graphics();
+				g.setStrokeStyle(1);
+				g.beginStroke(createjs.Graphics.getRGB(0,0,0));
+				s = new createjs.Shape(g);
+				s.width = 640;
+				s.height = 480;
+				stage.addChild(s);
+
+				newGame();
+
+				//setup ticker
+				createjs.Ticker.setFPS(60);
+				createjs.Ticker.addListener(window);
+
+				//
+				//console.log(player.x);
+			}
+
+			function empty() {
+				console.log("empty");
+			}
+
+			function gameOver() {
+				//console.log("off");
+				// document.getElementById('game').innerHTML = "off";
+				
+				// window.setTimeout("empty()",1000);
+				// console.log("gameOver-ing");
+				 newGame();
+				lfDn = false;
+				rtDn = false;
+				upDn = false;
+				dnDn = false;
+
+
+			}
+
+			function bombAndRadius(location) {
+				this.location = new createjs.Point();
+				this.location.x = location.x;
+				this.location.y = location.y;
+				this.speed = bombSpeed;
+				this.circle;
+				return this;
+
+			}
+
+			bombAndRadius.prototype.die = function() {
+				console.log("dying");
+				//console.log(this.parent);
+				this.circle.x = undefined;
+				this.circle.y = undefined;
+				//next line may cause problem with multiple bombs
+				////bs.numBombs -= 1;
+				stage.removeChild(this.circle);
+				console.log(this.circle.x);
+				level += 1;
+			};
+
+			bombAndRadius.prototype.createCircles = function() {
+				//console.log("creating bombs");
+				this.circle = new createjs.Shape();
+				this.circle.graphics.beginRadialGradientFill(["#0000FF", "#FFFFFF"], [.01, 1], this.location.x, this.location.y, 0, this.location.x, this.location.y, blast).drawCircle(this.location.x, this.location.y, blast);
+				this.circle.x = this.location.x;
+				this.circle.y = this.location.y;
+				this.circle.regX = this.circle.x;
+				this.circle.regY = this.circle.y;
+				stage.addChild(this.circle);
+			};
+
+			bombAndRadius.prototype.explode = function() {
+				console.log("exploding");
+				// //console.log("called die function");
+				if(distance(this.circle,player) <= blast) {
+					gameOver();
+
+				}
+				else{
+					this.die();
+				};
+			};
+
+
+			bombAndRadius.prototype.updateBomb = function(){
+				//console.log("updateBomb");
+
+
+				if(distance(this.circle,player) <= blast) {
+					//console.log(this);
+					var thisBomb = this;
+					console.log(thisBomb);
+					window.setTimeout("thisBomb.explode()",1000);
+				}
+
+				//console.log(this);
+				r = rand(this.circle.rotation-bombWiggle, this.circle.rotation+bombWiggle);
+				this.circle.rotation = r
+				//console.log(r);
+				if(this.circle.x > canvas.width || this.circle.x < 0) {
+					this.circle.rotation += 180;
+				};
+				if(this.circle.y > canvas.height || this.circle.y < 0) {
+					this.circle.rotation += 180;
+				};
+				this.circle.x += bombSpeed * Math.cos(toRadians(90 - this.circle.rotation));
+				this.circle.y += bombSpeed * Math.sin(toRadians(90 - this.circle.rotation));
+
+			};
+
+
+			function bombSystem() {
+				this.bombs = new Array();
+				this.numBombs = level;
+				this.startPlace = new createjs.Point();
+
+			}
+
+			bombSystem.prototype.addBomb = function() {
+				bombX = rand (0,canvas.width);
+				bombY = rand (0,canvas.height);
+				this.startPlace.x = bombX;
+				this.startPlace.y = bombY;
+				var currentBomb = new bombAndRadius(this.startPlace);
+				this.bombs.push(currentBomb);
+				//console.log(this.bombs);
+			};
+
+			bombSystem.prototype.bombsSetup = function() {
+				for (var i = 0; i < this.numBombs; i++) {
+					this.addBomb();
+					this.bombs[i].createCircles();
+				};
+			};
+
+			bombSystem.prototype.update = function() {
+				for (var i = 0; i < this.numBombs; i++) {
+					this.bombs[i].updateBomb();
+				};
+			};
+
+			function createVector(xpos, ypos) {  
+					var p= new createjs.Point(xpos,ypos); 
+					return p; 
+			} 
+
+			function rand(min, max) {
+				return Math.random() * (max - min + 1) + min;
+			}
+
+			function distance(obj1, obj2) {
+				var xDist = obj2.x - obj1.x;
+				var yDist = obj2.y - obj1.y;
+				var dist =  Math.sqrt(xDist*xDist + yDist*yDist);
+				//console.log(dist);
+				return dist;
+			}
+
+			function toRadians (angle) {
+				return angle * (Math.PI / 180);
+			}
+
+			function restart() {
+				stage.removeAllChildren();
+
+				// bombX = rand (0,canvas.width);
+				// bombY = rand (0,canvas.height);
+				// bomb.x = bombX;
+				// bomb.y = bombY;
+
+				//setup bombs
+				bs = new bombSystem();
+				bs.bombsSetup();
+
+				// gBomb = new createjs.Graphics();
+				// gBomb.setStrokeStyle(1);
+				// gBomb.beginStroke(createjs.Graphics.getRGB(0,0,0));
+				// gBomb.beginFill (createjs.Graphics.getRGB(0,0,255));
+				// gBomb.drawCircle(0,0,radius);
+				// bomb = new createjs.Shape(gBomb);
+				// stage.addChild(bomb);
+				//
+
+				//setup player
+				gPlayer = new createjs.Graphics();
+				gPlayer.setStrokeStyle(1);
+				gPlayer.beginStroke(createjs.Graphics.getRGB(0,0,0));
+				gPlayer.beginFill (createjs.Graphics.getRGB(255,0,0));
+				gPlayer.drawPolyStar(0,0,radius,3,0,270);
+				player = new createjs.Shape(gPlayer);
+				stage.addChild(player);
+
+				player.x = canvas.width * 0.5;
+				player.y = canvas.height * 0.5;
+				player.rotation = 0;
+
+				document.getElementById('game').innerHTML = "on";
+				
+			}
+
+			function newGame() {
+				level = 1;
+				document.getElementById('level').innerHTML = level;
+				restart();
+				
+			}
+
+			function eat() {
+				level += 1;
+				document.getElementById('level').innerHTML = level;
+				restart();
+			}
+
+			// function checkDist() {
+			// 	if (distance(player,bomb) <= radius * 2) {
+			// 		eat();
+			// 	}
+			// }
+
+			function tick() {
+				if (lfDn) {
+					player.rotation -= 3;
+					//checkDist();
+				};
+				if (upDn) {
+					//console.log(player.rotation );
+					player.x += Math.cos(toRadians(90 - player.rotation));
+					player.y -= Math.sin(toRadians(90 - player.rotation));
+					//console.log(player.x, player.y);
+					//checkDist();
+				};
+				if (rtDn) {
+					player.rotation += 3;
+					//checkDist();
+				};
+				// if (dnDn) {
+				// 	player.y += 1;
+				// 	//checkDist();
+				// };
+
+				bs.update();
+
+				stage.update();
+
+			}
+
+			function handleKeyDown (e) {
+				if (!e) { var e = window.event; }
+				switch (e.keyCode) {
+					case 37: 	lfDn = true; break;
+					case 38: 	upDn = true; break;
+					case 39: 	rtDn = true; break;
+					//case 40: 	dnDn = true; break;
+
+					case 82: 	newGame(); break;
+				}
+			}
+
+			function handleKeyUp (e) {
+				if (!e) { var e = window.event; }
+				switch (e.keyCode) {
+					case 37: 	lfDn = false; break;
+					case 38: 	upDn = false; break;
+					case 39: 	rtDn = false; break;
+					//case 40: 	dnDn = false; break;
+				}
+			}
+
+		</script>
+
+		<style type="text/css">
+			/*button {
+				color: blue;
+			}*/
+		</style>
+	</head>
+
+	<body onload="init()">
+		<canvas width="640" height="480" id="canvas"></canvas>
+		<br>
+		<button type="button" name="restart" onclick="newGame()"> Restart </button>
+		<div>
+			Level: <div id="level">1</div>
+			Test: <div id="game"></div>
+		</div>
+	</body>
+</html>

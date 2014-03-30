@@ -1,0 +1,33 @@
+div.image
+	{
+		margin: 2px;
+		border: 1px solid blue;
+		height: auto;
+		width: auto;
+		float: left;
+		text-align: center;
+		padding: 5px;
+	}
+
+div.image img
+	{
+		display: inline;
+		margin: 3px;
+		border: 1px solid white;
+		height: 175px;
+		width: 175px;
+	}
+
+div.image a:hover img
+	{
+		border: 1px solid blue;
+		opacity: .60;
+	}
+
+div.desc
+	{
+		text-align: center;
+		width: 175px;
+		margin: 2px;
+
+	}

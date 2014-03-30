@@ -1,0 +1,204 @@
+<!DOCTYPE html> 
+<html> 
+	<head> 
+			<title>Easel JS 101</title>
+			<script type="text/javascript" src="easel.js"></script>		
+
+			<script type="text/javascript">
+		
+		//https://github.com/phoenixperry/NightGamesInstallation/blob/master/src/ParticleSystem.java 
+
+		//code by Phoenix Perry - ported over from java. 
+
+		var stage; 
+		var canvas; 
+		var g; 
+		var s; 
+		var getRandX, getRandY; 
+
+		var circle; 
+		var ps; 
+		var w_, h; 
+		function init () {
+			console.log(" I inited");
+			getBrowswerWidth(); 
+
+			canvas = document.getElementById("canvas"); 
+			//sets everything full screen
+			canvas.width = w_; 
+			canvas.height =h; 
+
+			stage = new createjs.Stage(canvas); 
+			g = new createjs.Graphics();
+			//creates a one pixel line  
+			g.setStrokeStyle(1); 
+			g.beginStroke(createjs.Graphics.getRGB(0,0,0)); 
+			
+			s = new createjs.Shape(g);
+			s.width = 640; 
+			s.height = 480; 
+			stage.addChild(s);
+			createjs.Ticker.setFPS(60); 
+			createjs.Ticker.addListener(window); 
+			
+			//making just one particle to test 
+			var p = new createjs.Point(0,0)
+			cirlce = new particle(p);
+			cirlce.createCircle(); 
+			
+			//making lots of them after cirlce has run one time to init
+			ps = new particleSystem(); 
+			ps.setLocation(); 
+
+		
+		}
+		//full screen 
+		function getBrowswerWidth(){
+			 w_ = window.innerWidth 
+			|| document.documentElement.clientWidth
+			||	document.body.clientWidth; 
+
+			 h = window.innerHeight 
+			|| document.documentElement.clientHeight 
+			|| document.body.clientHeight; 
+
+			// var x = document.getElementById("demo"); 
+			// x.innerHTML = "browser inner window width " + w + " height: " + h; 
+		}
+
+		//function to allow for more higly tuned random numbers 
+		function getRandomInt(min, max) {
+			return Math.floor( Math.random() * (max-min +1)) +min
+		} 
+
+
+		function tick(){
+			g.lineTo(stage.mouseX, stage.mouseY); 
+			
+			cirlce.updateParticle();
+			ps.update(); 
+			stage.update(); 
+		} 
+
+
+
+		function particle(location) {
+			this.location = new createjs.Point();
+			this.location.x = location.x;
+			this.location.y = location.y;  
+			console.log(this.location.x + location.x + "here");
+			this.lifespan = 1; 
+			this.isDead; 
+			this.c_;
+			console.log("particle created"); 
+			this.velocity = createVector(Math.random(), Math.random()); 
+			
+			this.accel = createVector(Math.random(), Math.random()); 
+			
+			this.mass = createVector(Math.random(), Math.random()); 
+			//console.log(velocity.x, "I am vx"); 
+			//console.log(accel.x, "I am ax"); 
+			return this; 
+	}			
+
+	//putting code inside function duplicates it for each object - no good
+	particle.prototype.isDead = function(){	
+		if(lifespan < 0.0){
+				return true; 
+			}else{
+				return false; 
+			}
+	};
+
+	function createVector(xpos, ypos)
+	{  
+			var p= new createjs.Point(xpos,ypos); 
+			return p; 
+	} 
+
+	particle.prototype.createCircle = function(){
+			this.c_ = new createjs.Shape();
+			this.c_.graphics.beginFill("red").drawCircle(10,10,10); 
+			this.c_.x = this.location.x; 
+			this.c_.y = this.location.y; 
+			stage.addChild(this.c_);
+			this.lifespan= Math.random();
+	};
+		
+	particle.prototype.updateParticle = function(){
+				// console.log("particle updated"); 
+			this.velocity.x += this.accel.x; 
+			this.velocity.y += this.accel.y; 
+			this.accel.x*0; 
+			this.accel.y*0; 
+			this.lifespan -=.08;
+			this.location.x += this.velocity.x; 
+			this.location.y += this.velocity.y; 
+			this.c_.x =this.location.x; 
+			this.c_.y = this.location.y;
+			//this.c_.graphics.setRBG(255,0,0,this.lifespan);
+			console.log(this.lifespan);
+			
+	}; 
+		
+	particle.prototype.applyForce = function() {
+	
+			accel.x = f.x/mass; 
+			accel.y = f.y/mass; 
+	};
+
+	function particleSystem(){
+
+			this.particles = new Array(); 
+			this.origin; 
+			this.location;
+			this.numParticles = 15;  
+			this.startPlace = new createjs.Point();
+			console.log("ps inted");
+			return this; 
+
+		} 
+
+		particleSystem.prototype.addParticle = function(){
+			var r =Math.floor(Math.random() *100); 
+			var s = Math.floor(Math.random() *100); 
+			console.log(r + " " + s);
+			this.startPlace.x = r; 
+			this.startPlace.y = s; 
+			var currentParticle = new particle(this.startPlace);
+
+			this.particles.push(currentParticle);
+			console.log("ps added");
+
+		};
+
+		particleSystem.prototype.setLocation = function(){
+			this.origin = createVector(Math.random(), Math.random()); 
+			this.location = createVector(0,0);
+			this.origin.x = this.location.x; 
+			
+			for (var i = 0; i < this.numParticles; i++) {
+				this.addParticle();
+				console.log(" there are  " + i + " particles");
+				this.particles[i].createCircle();
+			}
+		};
+		
+		particleSystem.prototype.update = function(){
+			for (var i = 0; i < this.numParticles; i++) {
+				this.particles[i].updateParticle();
+				//console.log("ps updated");
+				this.particles[i].location.x; 
+			}
+		};
+
+
+
+			</script>
+	</head>
+	<body onload="init()">
+		<canvas width ="640" height="480" id="canvas"> 
+
+		</canvas>
+	</body>
+</html> 

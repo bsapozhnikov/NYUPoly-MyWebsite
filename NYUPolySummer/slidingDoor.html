@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+	<head><title>Sliding Door</title>
+		<style type="text/css">
+			#navlist {
+				position: relative;
+			}
+			#navlist li {
+				margin: 0px;
+				padding: 0px;
+				list-style: none;
+				position: absolute;
+				top: 0;
+			}
+			#navlist li, #navlist a{
+				height:44px;
+				display: block;
+			}
+			#home{
+				left:0px;
+				width:46px;
+			}
+			#home{
+				background:url("img_navsprites_hover.gif") 0 0;
+			}
+			#home a:hover{
+				background:url("img_navsprites_hover.gif") 0 -45px; 
+			}
+
+			#leftArrow{
+				left:47px;
+				width:43px;
+				background:url("img_navsprites_hover.gif") -47px 0;
+			}
+			#leftArrow a:hover{
+				background:url("img_navsprites_hover.gif") -47px -45px;
+			}
+
+
+		</style>
+
+	<body>
+		<ul id="navlist">
+			<li id="home">
+				<a href="#"></a>
+			</li>
+			<li id="leftArrow">
+				<a href="#"></a>
+			</li>
+		</ul>
+	</body>

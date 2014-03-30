@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Javascript 101</title>
+		<!--<script type="text/javascript">
+		// 	console.log("hello world");
+		// 	var myNum = 10;
+		// 	var myString = " ten is a number";
+		// 	var myCharacter = 'a';
+		// 	var myFloat = 10.5;
+		// 	console.log(myString + myNum + " " + myFloat + " " + myCharacter + " " + myFloat);
+		// 	for(var x = 0; x < 10; x++)
+		// 	//scope
+		// 	{
+		// 		console.log(x + " I am x's current value")
+		// 	}
+		</script>-->
+	</head>
+	<body>
+		<div id="demo">This will be replaced!</div>
+		<script type="text/javascript">
+			document.getElementById('demo').innerHTML = "my first javascript";
+			var myBoolean = true;
+			while(myBoolean)
+			{
+				console.log("the boolean is " + myBoolean);
+				myBoolean = false;
+			}
+			var myPlayer="is awesome";
+			if(myPlayer==="is awesome")
+			{
+				console.log("you are awesome");
+			}
+			else if(myPlayer==="is boring")
+			{
+				console.log("you are boring");
+			}
+			else{
+				console.log("you are just not awesome");
+			}
+		</script>
+	</body>
+</html>

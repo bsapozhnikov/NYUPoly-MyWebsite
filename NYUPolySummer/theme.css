@@ -1,0 +1,7 @@
+/*selector = the html tag you are affecting*/
+p
+	{
+	/*value:property;*/
+	color: blue;
+	margin: 10px;
+	}

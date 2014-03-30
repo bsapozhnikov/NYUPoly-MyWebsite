@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Easel JS 101</title>
+		<script type="text/javascript" src="easel.js"></script>
+		
+		<script type="text/javascript">
+			var stage;
+			var canvas;
+			var g;
+			var circle;
+			var s;
+			var getRandX, getRandY;
+			var location,accel,velocity,mass;
+
+			function getRandom(){
+				return Math.random();
+			}
+
+			function getRandomArbitrary(min,max) {
+				return Math.random() * (max - min) + min;
+			}
+
+
+			//non-uniform number distribution
+			function getRandomInt(min, max) {
+				return Math.floor(Math.random() * (max-min + 1)) + min;
+			}
+
+			var y = getRandom()
+
+			function init() {
+				console.log(y)
+				console.log("I inited");
+				canvas = document.getElementById("canvas");
+				stage = new createjs.Stage(canvas);
+				getBrowserWidth();
+				g = new createjs.Graphics();
+				//creates a one pixel line
+				g.setStrokeStyle(1);
+				g.beginStroke(createjs.Graphics.getRGB(0,0,0));
+				s = new createjs.Shape(g);
+				s.width = 640;
+				s.height = 480;
+				stage.addChild(s);
+
+				
+
+				createjs.Ticker.setFPS(60);
+				createjs.Ticker.addListener(window);
+				particle();	
+				particle.updateParticle;
+
+			}
+
+
+			function tick(){
+				getRandX = getRandomInt(0,10);
+				//console.log(getRand);
+				getRandY = getRandomInt(20,200);
+				g.lineTo(stage.mouseX, stage.mouseY);
+
+				// if(circle.x>w || circle.x<0 || circle.y>h || circle.y<0){
+				// 	circle.x = circle.x * -1;
+				// 	circle.y = circle.y * -1;
+				// };
+				 // circle.x = circle.x + getRandX;
+				 // circle.y = circle.y + getRandY;
+				 stage.update();
+				 particle.updateParticle;
+			}
+
+			function particle() {
+				this.updateParticle = updateParticle();
+				var x = Math.random();
+				var y = Math.random();
+				var xpos=1;
+				var ypos=1
+				var xa = 0;
+				var ya = 0.5;
+				var xm = 0;
+				var ym = 0.1;
+				var lifespan = 255;
+				velocity = new createjs.Point(x,y);
+				location = new createjs.Point(xpos, ypos);
+				accel = new createjs.Point(xa,ya);
+				mass = new createjs.Point(xm,ym);
+
+				circle = new createjs.Shape();
+				circle.graphics.beginFill("red").drawCircle(10,10,10);
+				circle.x = 100;
+				circle.y = 100;
+				stage.addChild(circle);
+			}
+
+			function updateParticle() {
+				console.log("particle updated")
+				velocity.x += accel.x;
+				velocity.y += accel.y;
+			}
+
+			function alertFunction(){
+				alert("I'm an alert box");
+			}
+
+			function getBrowserWidth(){
+				var w = window.innerWidth
+				|| document.documentElement.clientWidth
+				|| document.body.clientWidth;
+
+				var h = window.innerHeight
+				|| document.documentElement.clientHeight
+				|| document.body.clientHeight;
+
+				var x = document.getElementById("demo");
+				x.innerHTML = "browser inner window width " + w + " height: " + h; 
+			}
+
+		</script>
+	</head>
+	<body onload="init()">
+		<p id="demo">DEMO</p>
+		<button type="button" onclick="alertFunction()" value="Show alert box"> Show alert box </button>
+		<canvas width="640" height="480" id="canvas">
+
+		</canvas>
+	</body>
+</html>

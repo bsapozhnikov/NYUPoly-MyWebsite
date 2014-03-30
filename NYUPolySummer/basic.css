@@ -1,0 +1,21 @@
+body
+	{
+		background-color: #99CEDA;
+	}
+
+#header
+	{
+		color: red;
+		background-color: blue;
+		text-align: center;
+		font-weight: bold;
+		font-size: 200%;
+		margin-bottom: 50px
+	}
+
+p
+	{
+		color: green;
+		text-align: center;
+		font-size: 125%
+	}
